@@ -11,7 +11,7 @@ namespace MonitoringStack.Controllers
         [HttpGet]
         public IActionResult GetHello()
         {
-            return Ok("Hello World");
+            return Ok("Hello World from ci cd pipeline !git add .\r\n");
         }
 
 
