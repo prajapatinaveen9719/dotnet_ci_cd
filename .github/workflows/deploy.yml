@@ -10,23 +10,29 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Restore packages
-        run: dotnet restore
-        shell: powershell
-
-      - name: Build project
-        run: dotnet build -c Release --no-restore
-        shell: powershell
-
-      - name: Publish project
-        run: dotnet publish -c Release -o C:\inetpub\monitoring_api --no-build
-        shell: powershell
-
-      - name: Restart IIS App Pool
+      - name: Stop IIS App Pool
         shell: powershell
         run: |
           Import-Module WebAdministration
-          Restart-WebAppPool -Name "MonitoringStackAPI"
+          Stop-WebAppPool -Name "MonitoringStackAPI"
+
+      - name: Restore
+        run: dotnet restore
+        shell: powershell
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+        shell: powershell
+
+      - name: Publish
+        run: dotnet publish -c Release -o C:\inetpub\monitoring_api --no-build
+        shell: powershell
+
+      - name: Start IIS App Pool
+        shell: powershell
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool -Name "MonitoringStackAPI"
