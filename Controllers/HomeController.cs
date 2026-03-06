@@ -18,7 +18,7 @@ namespace MonitoringStack.Controllers
         [HttpGet("exception")]
         public IActionResult GetException()
         {
-            throw new InvalidOperationException("Something went wrong");
+            throw new InvalidOperationException("Something went wrong !");
         }
 
 
