@@ -24,3 +24,9 @@ jobs:
       - name: Publish API
         run: dotnet publish --configuration Release --output C:\deploy\dotnet_api --no-build
         shell: powershell
+
+      - name: Restart API
+        run: | 
+            taskkill /IM MonitoringStack.dll /F 2>$null
+            Start-Process dotnet "C:\deploy\dotnet_api\MonitoringStack.dll"
+        shell: powershell
