@@ -16,21 +16,24 @@ jobs:
       - name: Stop Running API
         shell: powershell
         run: |
-          taskkill /IM dotnet.exe /F
+          $connection = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue
+          if ($connection) {
+              Stop-Process -Id $connection.OwningProcess -Force
+          }
 
       - name: Restore Packages
         run: dotnet restore
         shell: powershell
 
       - name: Build Project
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build -c Release --no-restore
         shell: powershell
 
       - name: Publish API
-        run: dotnet publish --configuration Release --output C:\deploy\dotnet_api --no-build
+        run: dotnet publish -c Release -o C:\deploy\dotnet_api
         shell: powershell
 
       - name: Start API
         shell: powershell
         run: |
-          Start-Process "dotnet" "C:\deploy\dotnet_api\MonitoringStack.dll"
+          Start-Process dotnet -ArgumentList "C:\deploy\dotnet_api\MonitoringStack.dll"
