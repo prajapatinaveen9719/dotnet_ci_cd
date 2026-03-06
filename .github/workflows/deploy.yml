@@ -15,9 +15,12 @@ jobs:
 
       - name: Restore Packages
         run: dotnet restore
+        shell: powershell
 
       - name: Build Project
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release --no-restore
+        shell: powershell
 
       - name: Publish API
-        run: dotnet publish -c Release -o C:\deploy\dotnet_api
+        run: dotnet publish --configuration Release --output C:\deploy\dotnet_api --no-build
+        shell: powershell
