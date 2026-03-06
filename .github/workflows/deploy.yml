@@ -13,6 +13,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Stop Running API
+        shell: powershell
+        run: |
+          taskkill /IM dotnet.exe /F
+
       - name: Restore Packages
         run: dotnet restore
         shell: powershell
@@ -25,8 +30,7 @@ jobs:
         run: dotnet publish --configuration Release --output C:\deploy\dotnet_api --no-build
         shell: powershell
 
-      - name: Restart API
-        run: | 
-            taskkill /IM MonitoringStack.dll /F 2>$null
-            Start-Process dotnet "C:\deploy\dotnet_api\MonitoringStack.dll"
+      - name: Start API
         shell: powershell
+        run: |
+          Start-Process "dotnet" "C:\deploy\dotnet_api\MonitoringStack.dll"
