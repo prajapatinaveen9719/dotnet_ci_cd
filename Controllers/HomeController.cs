@@ -11,7 +11,7 @@ namespace MonitoringStack.Controllers
         [HttpGet]
         public IActionResult GetHello()
         {
-            return Ok("Hello World from ci cd pipeline devops !.\r\n");
+            return Ok("Hello World from ci cd pipeline devop changess !.\r\n");
 
 
         }
