@@ -29,19 +29,21 @@ jobs:
       - name: Backup Old Deployment
         shell: powershell
         run: |
-          $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-          $BackupFolder = "$env:BACKUP_PATH\MonitoringStack_$Timestamp"
+            $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+            $BackupFolder = "$env:BACKUP_PATH\MonitoringStack_$Timestamp"
 
-          if (!(Test-Path $env:BACKUP_PATH)) {
-              New-Item -Path $env:BACKUP_PATH -ItemType Directory
-          }
+            if (!(Test-Path $env:BACKUP_PATH)) {
+                New-Item -Path $env:BACKUP_PATH -ItemType Directory | Out-Null
+            }
 
-          if (Test-Path $env:DEPLOY_PATH) {
-              Copy-Item -Path $env:DEPLOY_PATH -Destination $BackupFolder
-              Write-Host "Backup saved to: $BackupFolder"
-          }
+            if (Test-Path $env:DEPLOY_PATH) {
+                Copy-Item -Path "$env:DEPLOY_PATH\*" -Destination $BackupFolder -Recurse
+                Write-Host "Backup saved to: $BackupFolder"
+            }
 
-          New-Item -Path $env:DEPLOY_PATH -ItemType Directory | Out-Null
+            if (!(Test-Path $env:DEPLOY_PATH)) {
+                New-Item -Path $env:DEPLOY_PATH -ItemType Directory | Out-Null
+            }
 
       - name: Build & Publish
         run: dotnet publish MonitoringStack.csproj -c Release -o $env:DEPLOY_PATH
