@@ -1,35 +1,57 @@
-﻿name: Deploy .NET API to IIS
+﻿name: .NET CI/CD to IIS
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  deploy:
+  build-deploy:
     runs-on: self-hosted
 
-    steps:
-      - uses: actions/checkout@v3
+    env:
+      DEPLOY_PATH: C:\inetpub\wwwroot\monitoring_api
+      BACKUP_PATH: C:\inetpub\wwwroot\Backups
 
-      - name: Stop IIS
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore NuGet Packages
+        run: dotnet restore MonitoringStack.sln
+
+      - name: Stop IIS AppPool
+        shell: powershell
         run: |
           Import-Module WebAdministration
           Stop-WebAppPool -Name "MonitoringStackAPI"
 
-      - name: Restore
-        run: dotnet restore
+      - name: Backup Old Deployment
+        shell: powershell
+        run: |
+          $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+          $BackupFolder = "$env:BACKUP_PATH\MonitoringStack_$Timestamp"
 
-      - name: Build
-        run: dotnet build -c Release --no-restore
+          if (!(Test-Path $env:BACKUP_PATH)) {
+              New-Item -Path $env:BACKUP_PATH -ItemType Directory
+          }
 
-      - name: Clean IIS Folder
-        run: Remove-Item "C:\inetpub\monitoring_api\*" -Recurse -Force
+          if (Test-Path $env:DEPLOY_PATH) {
+              Move-Item -Path $env:DEPLOY_PATH -Destination $BackupFolder
+              Write-Host "Backup saved to: $BackupFolder"
+          }
 
-      - name: Publish
-        run: dotnet publish -c Release -o "C:\inetpub\monitoring_api" --no-build
+          New-Item -Path $env:DEPLOY_PATH -ItemType Directory | Out-Null
 
-      - name: Start IIS
+      - name: Build & Publish
+        run: dotnet publish MonitoringStack/MonitoringStack.csproj -c Release -o $env:DEPLOY_PATH
+
+      - name: Start IIS AppPool
+        shell: powershell
         run: |
           Import-Module WebAdministration
           Start-WebAppPool -Name "MonitoringStackAPI"
