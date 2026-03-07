@@ -44,7 +44,7 @@ jobs:
           New-Item -Path $env:DEPLOY_PATH -ItemType Directory | Out-Null
 
       - name: Build & Publish
-        run: dotnet publish MonitoringStack/MonitoringStack.csproj -c Release -o $env:DEPLOY_PATH
+        run: dotnet publish MonitoringStack.csproj -c Release -o $env:DEPLOY_PATH
 
       - name: Start IIS AppPool
         shell: powershell
