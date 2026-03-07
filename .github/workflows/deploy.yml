@@ -10,29 +10,26 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Stop IIS App Pool
-        shell: powershell
+      - name: Stop IIS
         run: |
           Import-Module WebAdministration
           Stop-WebAppPool -Name "MonitoringStackAPI"
 
       - name: Restore
         run: dotnet restore
-        shell: powershell
 
       - name: Build
         run: dotnet build -c Release --no-restore
-        shell: powershell
+
+      - name: Clean IIS Folder
+        run: Remove-Item "C:\inetpub\monitoring_api\*" -Recurse -Force
 
       - name: Publish
-        run: dotnet publish -c Release -o C:\inetpub\monitoring_api --no-build
-        shell: powershell
+        run: dotnet publish -c Release -o "C:\inetpub\monitoring_api" --no-build
 
-      - name: Start IIS App Pool
-        shell: powershell
+      - name: Start IIS
         run: |
           Import-Module WebAdministration
           Start-WebAppPool -Name "MonitoringStackAPI"
