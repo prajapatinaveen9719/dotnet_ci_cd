@@ -9,8 +9,8 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DEPLOY_PATH: C:\inetpub\monitoring_api
-      BACKUP_PATH: C:\inetpub\Backups
+      DEPLOY_PATH: C:\inetpub\wwwroot\monitoring_api
+      BACKUP_PATH: C:\inetpub\wwwroot\Backups
 
     steps:
       - name: Checkout Code
